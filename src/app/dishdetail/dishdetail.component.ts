@@ -17,7 +17,7 @@ import { baseURL } from '../shared/baseurl';
 export class DishdetailComponent implements OnInit {
 
   dish: Dish;
-  errMess:string;
+  errMess: string;
   dishIDs: string[];
   prev: string;
   next: string;
@@ -25,6 +25,7 @@ export class DishdetailComponent implements OnInit {
   commentFormDirective;
   commentForm: FormGroup;
   comment: Comment;
+  dishcopy: Dish;
   formErrors = {
     author: "",
     comment: "",
@@ -42,7 +43,7 @@ export class DishdetailComponent implements OnInit {
     private route: ActivatedRoute,
     private location: Location,
     private fb: FormBuilder,
-    @Inject(baseURL)private BaseURL) {
+    @Inject(baseURL) private BaseURL) {
     this.createForm();
   }
 
@@ -58,9 +59,10 @@ export class DishdetailComponent implements OnInit {
       )
       .subscribe((dish) => {
         this.dish = dish;
+        this.dishcopy = dish;
         this.setPrevNext(dish.id)
       },
-      errmess=>this.errMess = <any>errmess);
+        errmess => this.errMess = <any>errmess);
   }
 
   createForm() {
@@ -98,11 +100,21 @@ export class DishdetailComponent implements OnInit {
   }
 
   onSubmit() {
-    
+
     this.commentForm.value["date"] = new Date();
     this.comment = this.commentForm.value;
 
-    this.dish.comments.push(this.comment);
+    this.dishcopy.comments.push(this.comment);
+    this.dishService.putDish(this.dishcopy)
+      .subscribe(dish => {
+        this.dish = dish;
+        this.dishcopy = dish;
+      },
+        errmess => {
+          this.dish = null;
+          this.dishcopy = null;
+          this.errMess = <any>errmess;
+        })
     this.commentForm.reset({
       author: "",
       comment: "",
