@@ -17,6 +17,7 @@ import { baseURL } from '../shared/baseurl';
 export class DishdetailComponent implements OnInit {
 
   dish: Dish;
+  errMess:string;
   dishIDs: string[];
   prev: string;
   next: string;
@@ -58,7 +59,8 @@ export class DishdetailComponent implements OnInit {
       .subscribe((dish) => {
         this.dish = dish;
         this.setPrevNext(dish.id)
-      });
+      },
+      errmess=>this.errMess = <any>errmess);
   }
 
   createForm() {
