@@ -7,7 +7,6 @@ import { Dish } from '../shared/dish';
 import { DishService } from '../services/dish.service';
 import { Comment } from '../shared/comment';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
-import { baseURL } from '../shared/baseurl';
 
 @Component({
   selector: 'app-dishdetail',
@@ -43,7 +42,7 @@ export class DishdetailComponent implements OnInit {
     private route: ActivatedRoute,
     private location: Location,
     private fb: FormBuilder,
-    @Inject(baseURL) private BaseURL) {
+    @Inject('BaseURL') private BaseURL) {
     this.createForm();
   }
 
