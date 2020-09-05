@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { Params, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { switchMap } from 'rxjs/operators';
-
+import { trigger, state, style, animate, transition } from '@angular/animations';
 import { Dish } from '../shared/dish';
 import { DishService } from '../services/dish.service';
 import { Comment } from '../shared/comment';
@@ -11,7 +11,20 @@ import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 @Component({
   selector: 'app-dishdetail',
   templateUrl: './dishdetail.component.html',
-  styleUrls: ['./dishdetail.component.scss']
+  styleUrls: ['./dishdetail.component.scss'],
+  animations: [
+    trigger('visibility', [
+      state('shown', style({
+        transform: 'scale(1.0)',
+        opacity: 1
+      })),
+      state('hidden', style({
+        transform: 'scale(0.5)',
+        opacity: 0
+      })),
+      transition('* => *', animate('0.5s ease-in-out'))
+    ])
+  ]
 })
 export class DishdetailComponent implements OnInit {
 
@@ -25,6 +38,8 @@ export class DishdetailComponent implements OnInit {
   commentForm: FormGroup;
   comment: Comment;
   dishcopy: Dish;
+  visibility = 'shown';
+
   formErrors = {
     author: "",
     comment: "",
@@ -53,13 +68,17 @@ export class DishdetailComponent implements OnInit {
     let id = this.route.params.
       pipe(
         switchMap(
-          (params: Params) => this.dishService.getDish(params['id'])
+          (params: Params) => {
+            this.visibility = 'hidden'
+            return this.dishService.getDish(params['id'])
+          }
         )
       )
       .subscribe((dish) => {
         this.dish = dish;
         this.dishcopy = dish;
         this.setPrevNext(dish.id)
+        this.visibility = 'shown';
       },
         errmess => this.errMess = <any>errmess);
   }
@@ -125,8 +144,9 @@ export class DishdetailComponent implements OnInit {
 
   setPrevNext(dishId: string) {
     const index = this.dishIDs.indexOf(dishId);
-    this.prev = this.dishIDs[(this.dishIDs.length + index - 1) % this.dishIDs.length['id']]
-    this.next = this.dishIDs[(this.dishIDs.length + index + 1) % this.dishIDs.length['id']]
+    this.prev = this.dishIDs[(this.dishIDs.length + index - 1) % this.dishIDs.length]
+    this.next = this.dishIDs[(this.dishIDs.length + index + 1) % this.dishIDs.length]
+    console.log(this.dishIDs.length);
   }
 
   goBack(): void {
